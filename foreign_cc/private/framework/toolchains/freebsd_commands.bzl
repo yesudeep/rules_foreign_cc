@@ -1,4 +1,13 @@
-"""Define default foreign_cc framework commands. FreeBSD platforms use bash"""
+"""Define default foreign_cc framework commands.
+
+FreeBSD doesn't use bash by default but users can install it
+using:
+
+    $ sudo pkg install bash
+
+Also, Bash is one of the prerequisites for Bazel:
+https://docs.bazel.build/versions/main/install-compile-source.html#bootstrap-unix-prereq
+"""
 
 load(":commands.bzl", "FunctionAndCallInfo")
 
@@ -87,7 +96,7 @@ fi
 
 def copy_dir_contents_to_dir(source, target):
     # Beause FreeBSD `cp` doesn't have `--no-copy-directory`, we have to
-    # do something more complext for this environment.
+    # do something more complex for this environment.
     return """\
 if [[ -d "{source}" ]]; then
   cp -L -R "{source}"/* "{target}"
