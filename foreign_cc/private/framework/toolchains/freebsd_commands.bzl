@@ -148,14 +148,14 @@ if [[ -f "$1" ]]; then
     dest="$target/$(basename $1)"
     cp "$1" "$dest" && chmod +w "$dest" && touch -r "$1" "$dest"
   else
-    ln -s -f -t "$target" "$1"
+    ln -s -f "$1" "$target"
   fi
 elif [[ -L "$1" && ! -d "$1" ]]; then
   cp -pR "$1" "$2"
 elif [[ -d "$1" ]]; then
   SAVEIFS=$IFS
   IFS=$'\n'
-  local children=($(find -H "$1" -maxdepth 1 -mindepth 1))
+  local children=($(find "$1/" -maxdepth 1 -mindepth 1))
   IFS=$SAVEIFS
   local dirname=$(basename "$1")
   mkdir -p "$target/$dirname"
