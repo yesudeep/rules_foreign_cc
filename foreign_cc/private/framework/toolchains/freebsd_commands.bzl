@@ -54,7 +54,7 @@ def rm_rf(path):
     return "rm -rf " + path
 
 def if_else(condition, if_text, else_text):
-    return """
+    return """\
 if [ {condition} ]; then
   {if_text}
 else
@@ -123,13 +123,13 @@ local target="$2"
 mkdir -p "$target"
 if [[ -f "$1" ]]; then
   ##symlink_to_dir## "$1" "$target"
-elif [[ -L "$1" ]]; then
+elif [[ -L "$1" && ! -d "$1" ]]; then
   local actual=$(readlink "$1")
   ##symlink_contents_to_dir## "$actual" "$target"
 elif [[ -d "$1" ]]; then
   SAVEIFS=$IFS
   IFS=$'\n'
-  local children=($(find -H "$1" -maxdepth 1 -mindepth 1))
+  local children=($(find "$1/" -maxdepth 1 -mindepth 1))
   IFS=$SAVEIFS
   for child in "${children[@]:-}"; do
     ##symlink_to_dir## "$child" "$target"
@@ -184,7 +184,7 @@ def script_prelude():
 
 def increment_pkg_config_path(source):
     text = """\
-local children=$(find $1 -mindepth 1 -name '*.pc')
+local children=$(find "$1/" -mindepth 1 -name '*.pc')
 # assume there is only one directory with pkg config
 for child in $children; do
   export PKG_CONFIG_PATH="$${PKG_CONFIG_PATH:-}$$:$(dirname $child)"
@@ -216,7 +216,7 @@ def cleanup_function(on_success, on_failure):
 def children_to_path(dir_):
     text = """\
 if [ -d {dir_} ]; then
-  local tools=$(find $EXT_BUILD_DEPS/bin -maxdepth 1 -mindepth 1)
+  local tools=$(find $EXT_BUILD_DEPS/bin/ -maxdepth 1 -mindepth 1)
   for tool in $tools;
   do
     if  [[ -d \"$tool\" ]] || [[ -L \"$tool\" ]]; then
